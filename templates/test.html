@@ -1,0 +1,105 @@
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TEST</title>
+
+        <style media="screen">
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                width: 100vw;
+                height: 100vh;
+                margin: 0;
+                padding: 5vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                font-size: 18px;
+            }
+
+            #btn-report {
+                width: 30vh;
+                height: 30vh;
+                margin-top: 10vh;
+                border-radius: 20px;
+                outline: none;
+                border: 1px solid rgba(0, 0, 0, .3);
+                font-size: 1.5em;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <input id="input-id" type="text" maxlength="10" required placeholder="Client ID">
+        <button id="btn-connect">連接</button>
+
+        <p id="para-news"></p>
+
+        <button id="btn-report">報告</button>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script type="text/javascript" charset="utf-8">
+        var clientId = ""
+        // var lat = Math.random() * 180 - 90
+        // var lon = Math.random() * 360 - 180
+        var lat = 25.128125
+        var lon = 121.739095
+        var plates = ['ABC-1234', 'AED-6631', '9572-EN', '6951-FG']
+
+        function constructData() {
+            return {
+                clientId: clientId,
+                lat: lat,
+                lon: lon,
+                plates: plates,
+            }
+        }
+
+        var socket = io();
+
+        const btnConnect = document.getElementById("btn-connect")
+        btnConnect.onclick = () => {
+            clientId = document.getElementById("input-id").value
+            socket.emit('client-connect', { clientId: clientId })
+
+            btnConnect.style.display = "none"
+            document.getElementById("input-id").style.display = "none"
+        }
+
+        const btnReport = document.getElementById("btn-report")
+        btnReport.onclick = () => { socket.emit('event-flag', constructData()) }
+
+        const paraNews = document.getElementById("para-news")
+
+
+        setInterval(() => {
+            if (clientId === "")
+                return
+
+            lat -= 0.0001
+            lon -= 0.0001
+
+            socket.emit('client-update', {
+                userId: userId,
+                lat: lat,
+                lon: lon,
+            })
+        }, 1000)
+
+        // socket.on('connect', function() {
+        //     socket.emit('event-flag', { data: 'I\'m connected!' });
+        // });
+
+        socket.on("danger", (data) => {
+            paraNews.innerText += `附近有危險記錄車輛： ${data.plate} (${data.lat}, ${data.lon})\n`
+        });
+
+        socket.on("accident", (data) => {
+            paraNews.innerText += `前方有車禍發生，請小心駕駛。\n`
+        });
+    </script>
+</html>
