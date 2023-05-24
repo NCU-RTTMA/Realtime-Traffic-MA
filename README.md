@@ -20,11 +20,11 @@ We currently generate fake car data to test the system.
 
 ## Folder Structure
 - project
-  app.py : The root application script
-  cache.py : For cache handling between REDIS and MongoDB
-  websocket.py : For handling WebSocket events
-  serve.sh : A simple startup script
-  stop.sh : A script to shutdown databases
+  - app.py : The root application script
+  - cache.py : For cache handling between REDIS and MongoDB
+  - websocket.py : For handling WebSocket events
+  - serve.sh : A simple startup script
+  - stop.sh : A script to shutdown databases
   - api : REST API scripts
     - car.py
     - user.py
