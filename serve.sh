@@ -16,4 +16,5 @@ on_exit()
 # cd ./src
 #trap on_exit EXIT
 # flask --app rest.py --debug run
+cd src
 python3 app.py

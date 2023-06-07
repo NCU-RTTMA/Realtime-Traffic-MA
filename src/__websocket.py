@@ -17,6 +17,7 @@ def initialize_connection(data):
 @socketio.on('event-flag')
 def handle_event_flag(data):
     print(f'Report received from user {data["ClientId"]}')
+    emit('report-ok', {  })
 
     for p in data['plates']:
         if Car.objects.filter(plate=p).count() > 0:

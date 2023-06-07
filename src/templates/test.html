@@ -43,16 +43,18 @@
     </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
-        var clientId = ""
+        var userId = ""
         // var lat = Math.random() * 180 - 90
         // var lon = Math.random() * 360 - 180
         var lat = 25.128125
         var lon = 121.739095
         var plates = ['ABC-1234', 'AED-6631', '9572-EN', '6951-FG']
 
+        var flagCooldown = false
+
         function constructData() {
             return {
-                clientId: clientId,
+                userId: userId,
                 lat: lat,
                 lon: lon,
                 plates: plates,
@@ -63,36 +65,47 @@
 
         const btnConnect = document.getElementById("btn-connect")
         btnConnect.onclick = () => {
-            clientId = document.getElementById("input-id").value
-            socket.emit('client-connect', { clientId: clientId })
+            userId = document.getElementById("input-id").value
+            socket.emit('user-connect', { userId: userId })
 
             btnConnect.style.display = "none"
             document.getElementById("input-id").style.display = "none"
         }
 
         const btnReport = document.getElementById("btn-report")
-        btnReport.onclick = () => { socket.emit('event-flag', constructData()) }
+        btnReport.onclick = () => {
+            if (flagCooldown) return
+
+            flagCooldown = true
+            socket.emit('user-report', constructData())
+
+            setTimeout(() => { flagCooldown = false }, 2000)
+        }
 
         const paraNews = document.getElementById("para-news")
 
 
         setInterval(() => {
-            if (clientId === "")
+            if (userId === "")
                 return
 
             lat -= 0.0001
             lon -= 0.0001
 
-            socket.emit('client-update', {
+            socket.emit('user-update', {
                 userId: userId,
                 lat: lat,
                 lon: lon,
             })
         }, 1000)
 
-        // socket.on('connect', function() {
-        //     socket.emit('event-flag', { data: 'I\'m connected!' });
-        // });
+        socket.on('user-connect-ok', function() {
+            console.log("CONNECTED!")
+        });
+
+        socket.on('user-report-ack', function() {
+            console.log("Report OK!")
+        });
 
         socket.on("danger", (data) => {
             paraNews.innerText += `附近有危險記錄車輛： ${data.plate} (${data.lat}, ${data.lon})\n`
@@ -101,5 +114,9 @@
         socket.on("accident", (data) => {
             paraNews.innerText += `前方有車禍發生，請小心駕駛。\n`
         });
+
+        socket.on("report-ok", () => {
+            paraNews.innerText += `報告成功。\n`
+        })
     </script>
 </html>

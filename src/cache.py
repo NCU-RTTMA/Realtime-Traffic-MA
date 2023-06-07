@@ -23,6 +23,7 @@ def _cache_loop_(redis):
             car.save()
 
             # Remove from cache
+            redis.delete(plate)
             del global_cache[plate]
             print(f'Removed {plate} from cache and updated DB. (TTL timeout)')
             return
@@ -62,4 +63,4 @@ def update_car_cache(plate, lat, lon):
 
 
 # TEST
-update_car_cache('ABC-1234', 60, 39.5)
+# update_car_cache('ABC-1234', 60, 39.5)
