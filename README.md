@@ -7,24 +7,22 @@ We currently generate fake car data to test the system.
 ## Tasks
 - [x] REDIS/MongoDB Connection
 - [x] WebSocket Connection
-- [ ] Car record caching
-- [ ] User report event handling
+- [x] Car record caching
+- [x] User report event handling
 - [ ] Car path tracing
 
 ## Libraries/Frameworks
 - flask
 - flask_socketio
 - flask_rest
-- flask_redis
+- redis-py
 - mongoengine/pymongo
+- Docker / Docker Compose
 
 ## Folder Structure
 - project
   - app.py : The root application script
   - cache.py : For cache handling between REDIS and MongoDB
-  - websocket.py : For handling WebSocket events
-  - serve.sh : A simple startup script
-  - stop.sh : A script to shutdown databases
   - api : REST API scripts
     - car.py
     - user.py
@@ -37,32 +35,15 @@ We currently generate fake car data to test the system.
 
 ## Running the Server
 
-### 1. Install Redis
+The application has been wrapped into a Docker Compose package.
+
+### Step 1: Build the images
 ```bash
-curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-
-echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-
-sudo apt-get update
-sudo apt-get install redis
+docker compose build
 ```
 
-### 2. Install pip dependencies
+### Step 2: Launch the containers
 ```bash
-# Create a virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install pip packages
-pip install -r requirements.txt
+docker compose up -d
 ```
-
-### 3. Ensure databases have been shutdown
-```bash
-sudo bash ./stop.sh
-```
-
-### 4. Starting the server
-```bash
-sudo bash ./serve.sh
-```
+Note: Remove the `-d` parameter to see the real-time console logs

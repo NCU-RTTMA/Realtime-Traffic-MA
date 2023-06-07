@@ -1,4 +1,8 @@
-# WebSocket event handlers
+# THIS IS DEPRECATED AND HAS NO EFFECT!!!
+# THIS IS DEPRECATED AND HAS NO EFFECT!!!
+# THIS IS DEPRECATED AND HAS NO EFFECT!!!
+# THIS IS DEPRECATED AND HAS NO EFFECT!!!
+# THIS IS DEPRECATED AND HAS NO EFFECT!!!
 
 from flask_socketio import send, emit
 from random import choice

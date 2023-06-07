@@ -25,13 +25,6 @@ client = MongoClient('mongodb://mongo', 27017)
 connect('cardetect', host="mongo", port=27017)
 
 
-# REDIS cache server initialization
-# from flask_redis import FlaskRedis
-# REDIS_URL = "redis://redis:6379/0"
-# app.config['REDIS_URL'] = 'redis://redis:6379/0'
-# redis = FlaskRedis()
-# redis.init_app(app)
-
 from redis import Redis
 redis = Redis(host='redis', port=6379)
 
@@ -45,15 +38,12 @@ api.add_resource(CarApi, '/car')
 
 
 
-
-
-
 # WebSocket initialization
-from websocket import *
+from flask_socketio import send, emit
 socketio = SocketIO(app)
 
 @socketio.on('user-connect')
-def initialize_connection(data):
+def handle_client_connect(data):
     user = User(userId=data['userId'], lat=0.0, lon=0.0).save()
     emit('user-connect-ok', {  })
     print(f'User {data["userId"]} connected successfully.')
@@ -68,27 +58,19 @@ def handle_client_update(data):
 
 
 @socketio.on('user-report')
-def handle_client_update(data):
+def handle_client_report(data):
     emit('user-report-ack', {  })
-    update_car_cache('2334-MZ', 14.012564561354, 36.2416519484984)
+    for plate in data['plates']:
+        if plate == '':
+            continue
+        update_car_cache(redis, plate, data['lat'], data['lon'])
 
 
 
+# Generate some random new cars
+# Comment this out if you don't want to spawn new cars
 from generators import generate_car
 generate_car().save()
-
-
-# The cache event loop
-from cache import _cache_loop_
-from time import sleep
-from threading import Thread
-def periodic():
-    while True:
-        _cache_loop_(redis)
-        sleep(1)
-
-daemon = Thread(target=periodic, args=(), daemon=True, name='_cache_loop_')
-daemon.start()
 
 
 # App entry

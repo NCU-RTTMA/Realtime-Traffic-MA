@@ -37,18 +37,17 @@
         <input id="input-id" type="text" maxlength="10" required placeholder="Client ID">
         <button id="btn-connect">連接</button>
 
+        <br>
         <p id="para-news"></p>
 
+        <input id="input-report-plate" type="text" maxlength="200" required placeholder="Report Plate # (Separate by comma)">
         <button id="btn-report">報告</button>
     </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
         var userId = ""
-        // var lat = Math.random() * 180 - 90
-        // var lon = Math.random() * 360 - 180
         var lat = 25.128125
         var lon = 121.739095
-        var plates = ['ABC-1234', 'AED-6631', '9572-EN', '6951-FG']
 
         var flagCooldown = false
 
@@ -57,7 +56,7 @@
                 userId: userId,
                 lat: lat,
                 lon: lon,
-                plates: plates,
+                plates: document.getElementById("input-report-plate").value.split(','),
             }
         }
 
@@ -72,13 +71,15 @@
             document.getElementById("input-id").style.display = "none"
         }
 
+
         const btnReport = document.getElementById("btn-report")
         btnReport.onclick = () => {
             if (flagCooldown) return
-
             flagCooldown = true
+
             socket.emit('user-report', constructData())
 
+            document.getElementById("input-report-plate").value = ''
             setTimeout(() => { flagCooldown = false }, 2000)
         }
 
