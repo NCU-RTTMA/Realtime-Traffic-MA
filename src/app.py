@@ -73,6 +73,18 @@ from generators import generate_car
 generate_car().save()
 
 
+# The cache event loop
+from cache import _cache_loop_
+from time import sleep
+from threading import Thread
+def periodic():
+    while True:
+        _cache_loop_(redis)
+        sleep(0.1)
+
+daemon = Thread(target=periodic, args=(), daemon=True, name='_cache_loop_')
+daemon.start()
+
 # App entry
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", debug=True)

@@ -26,3 +26,20 @@ def update_car_cache(redis, plate, lat, lon):
     cache['last_recorded'] = str(datetime.now())
     redis.hmset(plate, cache)
     redis.expire(plate, 10)
+
+
+
+# This is called by the system every second
+def _cache_loop_(redis):
+    plates = r.keys("*")
+    for plate in plates:
+        if redis.ttl(plate) <= 0:
+            cache = redis.hgetall(plate)
+
+            car = Car.objects.get(plate=plate)
+            car.lat = cache['lat']
+            car.lon = cache['lon']
+            car.last_recorded = datetime.now()
+            car.vio_count = cache['vio_count']
+            car.danger_count = cache['danger_count']
+            car.save()
