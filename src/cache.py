@@ -20,15 +20,15 @@ def load_cache_from_db(plate):
 def update_car_cache(redis, plate, lat, lon):
     cache = redis.hgetall(plate) if redis.exists(plate) else load_cache_from_db(plate)
 
-    if cache['vio_count'] > 5 or cache['danger_count'] > 2:
+    if int(cache['vio_count']) > 5 or int(cache['danger_count']) > 2:
         emit('danger-alert', {
             'plate': plate,
-            'lat': lat,
-            'lon': lon,
+            'lat': float(cache['lat']),
+            'lon': float(cache['lon']),
         }, broadcast=True)
 
-    cache['lat'] = lat
-    cache['lon'] = lon
+    cache['lat'] = float(lat)
+    cache['lon'] = float(lon)
     cache['last_recorded'] = str(datetime.now())
     redis.hmset(plate, cache)
     redis.expire(plate, 10)
