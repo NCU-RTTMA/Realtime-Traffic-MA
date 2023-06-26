@@ -38,6 +38,8 @@ services:
     image: traffic
     # environment:
     #   - FLASK_SERVER_PORT=9091
+    expose:
+      - 35000
     networks:
       - docker-net
     depends_on:
@@ -53,9 +55,16 @@ services:
     networks:
       - docker-net
     environment:
-    - REDIS_HOSTS=local:rttma-redis:6379
+      - REDIS_HOSTS=local:rttma-redis:6379
+      #REDIS_HOST: "local:rttma-redis"
+        #REDIS_PORT: 6379
+        #REDIS_TLS: 1
+        #REDIS_TLS_CERT_FILE: /etc/ssl/certs/fullchain.pem
+        #REDIS_TLS_KEY_FILE: /etc/ssl/private/privkey.pem
+    volumes:
+      - /home/ubuntu/ssl:/etc/ssl
     ports:
-    - "8082:8081"
+      - "8082:8081"
 
 
   mongo-express:
@@ -70,11 +79,16 @@ services:
         - mongo
     environment:
         ME_CONFIG_MONGODB_SERVER: rttma-mongo
+        ME_CONFIG_SITE_SSL_ENABLED: true
+        ME_CONFIG_SITE_SSL_CRT_PATH: /etc/ssl/certs/fullchain.pem
+        ME_CONFIG_SITE_SSL_KEY_PATH: /etc/ssl/private/privkey.pem
         # ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
         # ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
         # ME_CONFIG_MONGODB_ENABLE_ADMIN: true
         # ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_USERNAME} # mongo-express login username and password.
         # ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - /home/ubuntu/ssl:/etc/ssl
 
   nginx:
     container_name: rttma-nginx
@@ -93,6 +107,7 @@ services:
       - traffic
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - /home/ubuntu/ssl:/etc/ssl
     # command: /bin/bash -c "envsubst < /etc/nginx/conf.d/nginx.conf > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'"
 
 

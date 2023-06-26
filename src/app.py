@@ -49,7 +49,7 @@ api.add_resource(CarApi, '/car')
 
 # WebSocket initialization
 from flask_socketio import send, emit
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @socketio.on('user-connect')
 def handle_client_connect(data):

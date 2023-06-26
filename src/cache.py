@@ -19,7 +19,7 @@ def load_cache_from_db(plate):
 # Update a particular cache
 def update_car_cache(redis, plate, lat, lon):
     cache = redis.hgetall(plate) if redis.exists(plate) else load_cache_from_db(plate)
-
+    print(plate)
     if int(cache['vio_count']) > 5 or int(cache['danger_count']) > 2:
         emit('danger-alert', {
             'plate': plate,
@@ -38,19 +38,21 @@ def update_car_cache(redis, plate, lat, lon):
 # This is called by the system every second
 def _cache_loop_(redis):
     plates = redis.keys("*")
+    print(plates)
     for plate in plates:
         # if not len(plate) in [7,8] or not '-' in plate:
         #     continue
+        #print(plate)
         if redis.ttl(plate) <= 0:
             # mongodb.print(plate)
             cache = redis.hgetall(plate)
 
-            if int(cache['vio_count']) > 5 or int(cache['danger_count']) > 0:
-                emit('danger-alert', {
-                    'plate': plate,
-                    'lat': float(cache['lat']),
-                    'lon': float(cache['lon']),
-                })
+            #if int(cache['vio_count']) > 5 or int(cache['danger_count']) > 0:
+            #    emit('danger-alert', {
+            #        'plate': plate,
+            #        'lat': float(cache['lat']),
+            #        'lon': float(cache['lon']),
+            #    })
 
 
             car = Car.objects.get(plate=plate)
