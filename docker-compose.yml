@@ -24,6 +24,7 @@ services:
       - 6379:6379
     volumes:
       - ./database/redis/data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
     container_name: redis
     networks:
       - docker-net

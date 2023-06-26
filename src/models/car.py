@@ -12,3 +12,15 @@ class Car(Document):
     last_recorded = DateTimeField(default=datetime.utcnow)
     vio_count = IntField(required=True, default=0)
     danger_count = IntField(required=True, default=0)
+
+    def to_json(self):
+        return {
+            'plate': self.plate,
+            'type': self.type,
+            'color': self.color,
+            'lat': self.lat,
+            'lon': self.lon,
+            'last_recorded': self.last_recorded,
+            'vio_count': self.vio_count,
+            'danger_count': self.danger_count,
+        }

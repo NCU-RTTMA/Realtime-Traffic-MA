@@ -37,6 +37,7 @@
         <input id="input-id" type="text" maxlength="10" required placeholder="Client ID">
         <button id="btn-connect">連接</button>
 
+        <p id="label-gps-location">Lat: Lon:</p>
         <br>
         <p id="para-news"></p>
 
@@ -83,6 +84,7 @@
             setTimeout(() => { flagCooldown = false }, 2000)
         }
 
+        const labelGpsLocation = document.getElementById("label-gps-location")
         const paraNews = document.getElementById("para-news")
 
 
@@ -92,6 +94,8 @@
 
             lat -= 0.0001
             lon -= 0.0001
+
+            labelGpsLocation.innerText = `Lat: ${lat}    Lon: ${lon}`
 
             socket.emit('user-update', {
                 userId: userId,
@@ -108,7 +112,22 @@
             console.log("Report OK!")
         });
 
-        socket.on("danger", (data) => {
+
+        function calcDistance(lat1,lon1,lat2,lon2) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2-lat1);  // deg2rad below
+            var dLon = deg2rad(lon2-lon1);
+            var a =
+              Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+              Math.sin(dLon/2) * Math.sin(dLon/2)
+              ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            var d = R * c; // Distance in km
+            return d;
+        }
+
+        socket.on("danger-alert", (data) => {
             paraNews.innerText += `附近有危險記錄車輛： ${data.plate} (${data.lat}, ${data.lon})\n`
         });
 
@@ -116,7 +135,7 @@
             paraNews.innerText += `前方有車禍發生，請小心駕駛。\n`
         });
 
-        socket.on("report-ok", () => {
+        socket.on("user-report-ack", () => {
             paraNews.innerText += `報告成功。\n`
         })
     </script>

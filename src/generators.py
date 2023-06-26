@@ -15,8 +15,8 @@ def generate_plate():
         right = ''.join([choice(string.ascii_uppercase) for i in range(2)])
         return f'{left}-{right}'
 
-def generate_car():
-    plate = generate_plate()
+def generate_car(plate=None):
+    plate = plate if plate else generate_plate()
     type = choice(['sedan', 'suv', 'hatchback', 'pickup'])
     color = choice(['white', 'black', 'blue', 'green', 'red', 'grey', 'silver', 'yellow'])
     lat, lon = 0, 0

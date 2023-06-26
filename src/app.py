@@ -25,9 +25,18 @@ client = MongoClient('mongodb://mongo', 27017)
 connect('cardetect', host="mongo", port=27017)
 
 
-from redis import Redis
-redis = Redis(host='redis', port=6379)
+from redis import StrictRedis
+redis = StrictRedis(host='redis', port=6379, decode_responses=True)
 
+def event_handler(msg):
+    print('Handler', msg)
+
+import time
+pubsub = redis.pubsub()
+pubsub.psubscribe(**{"__keyevent@0__:expired": event_handler})
+pubsub.run_in_thread(sleep_time=0.01)
+# for msg in pubsub.listen():
+#     print(time.time(), msg)
 
 # REST API initialization
 from api.user import UserApi
