@@ -41,8 +41,8 @@ services:
     networks:
       - docker-net
     depends_on:
-      - rttma-redis
-      - rttma-mongo
+      - redis
+      - mongo
 
 
   redis-commander:
@@ -53,7 +53,7 @@ services:
     networks:
       - docker-net
     environment:
-    - REDIS_HOSTS=local:redis:6379
+    - REDIS_HOSTS=local:rttma-redis:6379
     ports:
     - "8082:8081"
 
@@ -67,9 +67,9 @@ services:
     ports:
         - 8081:8081
     depends_on:
-        - rttma-mongo
+        - mongo
     environment:
-        ME_CONFIG_MONGODB_SERVER: mongo
+        ME_CONFIG_MONGODB_SERVER: rttma-mongo
         # ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
         # ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
         # ME_CONFIG_MONGODB_ENABLE_ADMIN: true
@@ -90,7 +90,7 @@ services:
       - $SERVER_HTTP_PORT
       - $SERVER_HTTPS_PORT
     depends_on:
-      - rttma-traffic
+      - traffic
     volumes:
       - ./nginx:/etc/nginx/conf.d
     # command: /bin/bash -c "envsubst < /etc/nginx/conf.d/nginx.conf > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'"
